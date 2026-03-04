@@ -12,6 +12,7 @@ function createCard(item) {
   card.className = "card";
 
   card.innerHTML = `
+    ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}">` : ""}
     <h2>${item.name}</h2>
     <p class="price">${formatPrice(item.priceCents, item.currency)}</p>
     <button>Order Now</button>

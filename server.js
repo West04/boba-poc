@@ -18,11 +18,20 @@ const client = new SquareClient({
 // ---------------------------------------------------------------------------
 app.get("/menu", async (_req, res) => {
   try {
-    const result = await client.catalog.list({ types: "ITEM" });
+    const [itemResult, imageResult] = await Promise.all([
+      client.catalog.list({ types: "ITEM" }),
+      client.catalog.list({ types: "IMAGE" }),
+    ]);
 
-    const items = (result.data || []).map((item) => {
+    const imageMap = new Map();
+    for (const img of imageResult.data || []) {
+      imageMap.set(img.id, img.imageData?.url);
+    }
+
+    const items = (itemResult.data || []).map((item) => {
       const variation = item.itemData?.variations?.[0];
       const priceMoney = variation?.itemVariationData?.priceMoney;
+      const imageId = item.itemData?.imageIds?.[0];
 
       return {
         catalogObjectId: item.id,
@@ -30,6 +39,7 @@ app.get("/menu", async (_req, res) => {
         variationId: variation?.id,
         priceCents: priceMoney ? Number(priceMoney.amount) : 0,
         currency: priceMoney?.currency || "USD",
+        imageUrl: imageId ? imageMap.get(imageId) : null,
       };
     });
 
