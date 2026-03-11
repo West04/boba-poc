@@ -21,7 +21,7 @@ app.use(express.static("public"));
 
 const client = new SquareClient({
   token: process.env.SQUARE_ACCESS_TOKEN,
-  environment: SquareEnvironment.Sandbox,
+  environment: SquareEnvironment.Production,
 });
 
 // ---------------------------------------------------------------------------
