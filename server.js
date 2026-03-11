@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import crypto from "node:crypto";
 import pkg from "square";
-import { replaceAllItems, getAllItems, hasItems } from "./db.js";
+import { replaceAllItems, getAllItems, hasItems, updateItem } from "./db.js";
 
 const { SquareClient, SquareEnvironment, WebhooksHelper } = pkg;
 
@@ -74,6 +74,66 @@ app.get("/menu", (_req, res) => {
   } catch (error) {
     console.error("Error reading menu from DB:", error);
     res.status(500).json({ error: "Failed to fetch menu items" });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// PUT /menu/:id – update item name/price in Square then SQLite
+// ---------------------------------------------------------------------------
+app.put("/menu/:id", async (req, res) => {
+  try {
+    const catalogObjectId = req.params.id;
+    const { name, priceCents } = req.body;
+
+    if (!name || priceCents == null) {
+      return res.status(400).json({ error: "name and priceCents are required" });
+    }
+
+    // Get current object from Square to obtain version and variation info
+    const existing = await client.catalog.object.get({ objectId: catalogObjectId });
+    const catalogObject = existing.object;
+    const variation = catalogObject.itemData?.variations?.[0];
+
+    if (!variation) {
+      return res.status(404).json({ error: "No variation found for this item" });
+    }
+
+    // Upsert updated item back to Square
+    await client.catalog.object.upsert({
+      idempotencyKey: crypto.randomUUID(),
+      object: {
+        type: "ITEM",
+        id: catalogObjectId,
+        version: catalogObject.version,
+        itemData: {
+          ...catalogObject.itemData,
+          name,
+          variations: [
+            {
+              type: "ITEM_VARIATION",
+              id: variation.id,
+              version: variation.version,
+              itemVariationData: {
+                ...variation.itemVariationData,
+                name,
+                priceMoney: {
+                  amount: BigInt(priceCents),
+                  currency: variation.itemVariationData?.priceMoney?.currency || "USD",
+                },
+              },
+            },
+          ],
+        },
+      },
+    });
+
+    // Update local DB after successful Square update
+    updateItem(catalogObjectId, name, priceCents);
+
+    res.json({ ok: true, catalogObjectId, name, priceCents });
+  } catch (error) {
+    console.error("Error updating menu item:", error);
+    res.status(500).json({ error: "Failed to update menu item" });
   }
 });
 

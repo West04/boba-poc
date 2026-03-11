@@ -42,6 +42,13 @@ export function getAllItems() {
   }));
 }
 
+export function updateItem(catalogObjectId, name, priceCents) {
+  const stmt = db.prepare(
+    "UPDATE menu_items SET name = ?, price_cents = ?, updated_at = datetime('now') WHERE catalog_object_id = ?"
+  );
+  return stmt.run(name, priceCents, catalogObjectId);
+}
+
 export function hasItems() {
   const row = db.prepare("SELECT COUNT(*) AS count FROM menu_items").get();
   return row.count > 0;
