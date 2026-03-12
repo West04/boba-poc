@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Boba Shop</title>
+    <title>Boba Shop – Categories &amp; Options</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -11,17 +11,28 @@
       <h1>Boba Shop</h1>
       <p>Fresh boba drinks, made to order</p>
       <nav>
-        <a href="/" class="nav-link active">Menu</a>
+        <a href="/" class="nav-link">Menu</a>
         <a href="/discounts.html" class="nav-link">Discounts</a>
-        <a href="/catalog.html" class="nav-link">Categories &amp; Options</a>
+        <a href="/catalog.html" class="nav-link active">Categories &amp; Options</a>
       </nav>
     </header>
 
     <main>
-      <div class="toolbar">
-        <button id="add-item-btn" class="btn-add">+ Add Item</button>
-      </div>
-      <div id="menu" class="menu-grid"></div>
+      <section class="catalog-section">
+        <div class="catalog-section-header">
+          <h2 class="catalog-section-title">Categories</h2>
+          <button id="add-category-btn" class="btn-add">+ Add Category</button>
+        </div>
+        <div id="categories" class="menu-grid"></div>
+      </section>
+
+      <section class="catalog-section">
+        <div class="catalog-section-header">
+          <h2 class="catalog-section-title">Modifier Options</h2>
+          <button id="add-modifier-list-btn" class="btn-add">+ Add Option List</button>
+        </div>
+        <div id="modifier-lists" class="menu-grid"></div>
+      </section>
     </main>
 
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -38,6 +49,6 @@
     </aside>
 
     <script src="sidebar.js"></script>
-    <script src="script.js"></script>
+    <script src="catalog.js"></script>
   </body>
 </html>

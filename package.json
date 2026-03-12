@@ -11,6 +11,7 @@
     "better-sqlite3": "^12.6.2",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
+    "multer": "^2.1.1",
     "square": "^42.1.0"
   }
 }
